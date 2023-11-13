@@ -4,7 +4,7 @@ import static christmas.domain.constant.Constant.DECEMBER_END_DATE;
 import static christmas.domain.constant.Constant.DECEMBER_START_DATE;
 import static christmas.domain.constant.ErrorMessage.INVALID_DATE;
 
-public class Date {
+public class Date implements Comparable<Date> {
 
     private final int value;
 
@@ -29,5 +29,10 @@ public class Date {
 
     protected int calculateRemainder(int value) {
         return this.value % value;
+    }
+
+    @Override
+    public int compareTo(Date date) {
+        return this.value - date.value;
     }
 }
