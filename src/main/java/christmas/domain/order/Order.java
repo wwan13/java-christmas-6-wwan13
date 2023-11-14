@@ -27,20 +27,9 @@ public class Order {
 
     public static Order of(List<String> menuAmounts) {
         Map<Menu, Integer> order = createOrder(menuAmounts);
-        validateMinimumOrderPrice(order);
         validateMaximumOrderAmount(order);
         validateOnlyDrink(order);
         return new Order(order);
-    }
-
-    private static void validateMinimumOrderPrice(Map<Menu, Integer> order) {
-        int totalPrice = order.keySet().stream()
-            .mapToInt(menu -> menu.getPrice() * order.get(menu))
-            .sum();
-
-        if (totalPrice < ORDER_MINIMUM_PRICE) {
-            throw new IllegalArgumentException(INVALID_ORDER);
-        }
     }
 
     private static void validateMaximumOrderAmount(Map<Menu, Integer> order) {
