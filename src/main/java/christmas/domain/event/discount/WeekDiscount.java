@@ -1,5 +1,7 @@
 package christmas.domain.event.discount;
 
+import static christmas.domain.constant.Constant.WEEK_EVENT_DISCOUNT_AMOUNT;
+import static christmas.domain.constant.ErrorMessage.CANNOT_APPLY_FORMAT;
 import static christmas.domain.date.DateType.WEEKDAY;
 import static christmas.domain.date.DateType.WEEKEND;
 import static christmas.domain.menu.MenuType.DESSERT;
@@ -15,9 +17,6 @@ public enum WeekDiscount implements Discount {
     WEEKDAY_DISCOUNT(WEEKDAY, DESSERT),
     WEEKEND_DISCOUNT(WEEKEND, MAIN);
 
-    private static final int DISCOUNT_AMOUNT = 2023;
-    private static final String ERROR_FORMAT_INVALID_DATE = "%d일에는 %s를 적용할 수 없습니다.";
-
     private final DateType dateType;
     private final MenuType target;
 
@@ -27,21 +26,29 @@ public enum WeekDiscount implements Discount {
     }
 
     @Override
-    public boolean isApplicable(Date date) {
-        return date.getDateType() == this.dateType;
+    public boolean isApplicableCore(Date date, Order order) {
+        return isSameDateType(date) && containsMenuType(order);
+    }
+
+    private boolean isSameDateType(Date date) {
+        return dateType.equals(date.getDateType());
+    }
+
+    private boolean containsMenuType(Order order) {
+        return order.countMenuTypeAmount(target) > 0;
     }
 
     @Override
     public int offer(Date date, Order order) {
-        validateOffer(date);
+        validateOffer(date, order);
         int amount = order.countMenuTypeAmount(this.target);
-        return amount * DISCOUNT_AMOUNT;
+        return amount * WEEK_EVENT_DISCOUNT_AMOUNT;
     }
 
-    private void validateOffer(Date date) {
-        if (!isApplicable(date)) {
+    private void validateOffer(Date date, Order order) {
+        if (!isApplicableCore(date, order)) {
             throw new IllegalArgumentException(
-                String.format(ERROR_FORMAT_INVALID_DATE, date.getValue(), this.name())
+                String.format(CANNOT_APPLY_FORMAT, date.getValue(), getClass().getName())
             );
         }
     }

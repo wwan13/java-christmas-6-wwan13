@@ -1,32 +1,35 @@
 package christmas.domain.event.discount;
 
+import static christmas.domain.constant.Constant.CHRISTMAS_DAY_EVENT_ADDITIONAL_DISCOUNT_AMOUNT;
+import static christmas.domain.constant.Constant.CHRISTMAS_DAY_EVENT_DEFAULT_DISCOUNT_AMOUNT;
+import static christmas.domain.constant.Constant.CHRISTMAS_DAY_EVENT_END_DATE;
+import static christmas.domain.constant.Constant.CHRISTMAS_DAY_EVENT_START_DATE;
+import static christmas.domain.constant.ErrorMessage.CANNOT_APPLY_FORMAT;
+
 import christmas.domain.date.Date;
 import christmas.domain.order.Order;
 
 public class ChristmasDayDiscount implements Discount {
 
-    private static final Date EVENT_START_DATE = Date.valueOf(1);
-    private static final Date EVENT_END_DATE = Date.valueOf(25);
-    private static final int DEFAULT_DISCOUNT_AMOUNT = 1000;
-    private static final int ADDITIONAL_DISCOUNT_AMOUNT = 100;
-    private static final String ERROR_FORMAT_INVALID_DATE =
-        "%d일에는 크리스마스 디데이 할인을 적용할 수 없습니다.";
-
     @Override
-    public boolean isApplicable(Date date) {
-        return date.compareTo(EVENT_START_DATE) >= 0 && date.compareTo(EVENT_END_DATE) <= 0;
+    public boolean isApplicableCore(Date date, Order order) {
+        return date.compareTo(CHRISTMAS_DAY_EVENT_START_DATE) >= 0
+            && date.compareTo(CHRISTMAS_DAY_EVENT_END_DATE) <= 0;
     }
 
     @Override
     public int offer(Date date, Order order) {
-        int dateGap = date.compareTo(EVENT_START_DATE);
-        return DEFAULT_DISCOUNT_AMOUNT + (dateGap * ADDITIONAL_DISCOUNT_AMOUNT);
+        validateOffer(date, order);
+        int dateGap = date.compareTo(CHRISTMAS_DAY_EVENT_START_DATE);
+
+        return CHRISTMAS_DAY_EVENT_DEFAULT_DISCOUNT_AMOUNT
+            + (dateGap * CHRISTMAS_DAY_EVENT_ADDITIONAL_DISCOUNT_AMOUNT);
     }
 
-    private void validate(Date date) {
-        if (!isApplicable(date)) {
+    private void validateOffer(Date date, Order order) {
+        if (!isApplicableCore(date, order)) {
             throw new IllegalArgumentException(
-                String.format(ERROR_FORMAT_INVALID_DATE, date.getValue())
+                String.format(CANNOT_APPLY_FORMAT, date.getValue(), getClass().getName())
             );
         }
     }
