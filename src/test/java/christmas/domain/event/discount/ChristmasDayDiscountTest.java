@@ -1,6 +1,7 @@
 package christmas.domain.event.discount;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import christmas.domain.date.Date;
 import christmas.domain.order.Order;
@@ -8,6 +9,7 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
@@ -22,10 +24,11 @@ class ChristmasDayDiscountTest {
     void 이벤트가_적용_가능한지_알_수_있다(final int dateValue, final boolean expected) {
         // given
         Date date = Date.valueOf(dateValue);
-        ChristmasDayDiscount discount = new ChristmasDayDiscount();
+        Order order = Order.of(List.of("티본스테이크-1", "바비큐립-1", "초코케이크-2", "제로콜라-1"));
+        Discount discount = new ChristmasDayDiscount();
 
         // when
-        boolean result = discount.isApplicable(date);
+        boolean result = discount.isApplicableCore(date, order);
 
         // then
         assertThat(result).isEqualTo(expected);
@@ -44,5 +47,18 @@ class ChristmasDayDiscountTest {
 
         // then
         assertThat(result).isEqualTo(expected);
+    }
+
+    @Test
+    void 이벤트_기간이_아닌_날짜를_입력하면_예외가_발생한다() {
+        // given
+        Date date = Date.valueOf(26);
+        Order order = Order.of(List.of("티본스테이크-1", "바비큐립-1", "초코케이크-2", "제로콜라-1"));
+
+        ChristmasDayDiscount discount = new ChristmasDayDiscount();
+
+        // when, then
+        assertThatThrownBy(() -> discount.offer(date, order))
+            .isInstanceOf(IllegalArgumentException.class);
     }
 }
