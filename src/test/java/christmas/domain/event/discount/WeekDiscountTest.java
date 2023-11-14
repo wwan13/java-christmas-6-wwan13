@@ -28,11 +28,12 @@ class WeekDiscountTest {
         void 이벤트가_적용_가능한지_알_수_있다(final int dateValue, final boolean expected) {
             // given
             Date date = Date.valueOf(dateValue);
+            Order order = Order.of(List.of("티본스테이크-1", "바비큐립-2", "초코케이크-2", "제로콜라-1"));
 
             WeekDiscount discount = WeekDiscount.WEEKDAY_DISCOUNT;
 
             // when
-            boolean result = discount.isApplicable(date);
+            boolean result = discount.isApplicableCore(date, order);
 
             // then
             assertThat(result).isEqualTo(expected);
@@ -76,11 +77,12 @@ class WeekDiscountTest {
         void 이벤트가_적용_가능한지_알_수_있다(final int dateValue, final boolean expected) {
             // given
             Date date = Date.valueOf(dateValue);
+            Order order = Order.of(List.of("티본스테이크-1", "바비큐립-2", "초코케이크-2", "제로콜라-1"));
 
             WeekDiscount discount = WeekDiscount.WEEKEND_DISCOUNT;
 
             // when
-            boolean result = discount.isApplicable(date);
+            boolean result = discount.isApplicableCore(date, order);
 
             // then
             assertThat(result).isEqualTo(expected);
