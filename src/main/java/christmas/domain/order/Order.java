@@ -2,10 +2,10 @@ package christmas.domain.order;
 
 import static christmas.domain.constant.Constant.ORDER_MAXIMUM_AMOUNT;
 import static christmas.domain.constant.Constant.ORDER_MINIMUM_AMOUNT;
-import static christmas.domain.constant.Constant.ORDER_MINIMUM_PRICE;
 import static christmas.domain.constant.ErrorMessage.INVALID_ORDER;
 import static christmas.domain.menu.MenuType.DRINK;
 
+import christmas.common.converter.StringConverter;
 import christmas.domain.menu.Menu;
 import christmas.domain.menu.MenuType;
 import java.util.Collections;
@@ -54,18 +54,18 @@ public class Order {
 
     private static Map<Menu, Integer> createOrder(List<String> menuAmounts) {
         Map<Menu, Integer> order = new EnumMap<>(Menu.class);
-
         menuAmounts.forEach(menuAmount -> {
-            Menu menu = Menu.of(menuAmount.split(DELIMITER)[MENU_INDEX]);
-            validateMenuContainsInOrder(menu, order);
-
-            int amount = parseIntWithExceptionThrow(menuAmount.split(DELIMITER)[AMOUNT_INDEX]);
-            validateAmountPerMenu(amount);
-
+            Menu menu = createMenu(menuAmount.split(DELIMITER)[MENU_INDEX], order);
+            int amount = parseAmount(menuAmount.split(DELIMITER)[AMOUNT_INDEX]);
             order.put(menu, amount);
         });
-
         return order;
+    }
+
+    private static Menu createMenu(String value, Map<Menu, Integer> order) {
+        Menu menu = Menu.of(value);
+        validateMenuContainsInOrder(menu, order);
+        return menu;
     }
 
     private static void validateMenuContainsInOrder(Menu menu, Map<Menu, Integer> order) {
@@ -74,12 +74,12 @@ public class Order {
         }
     }
 
-    private static int parseIntWithExceptionThrow(String value) {
-        try {
-            return Integer.parseInt(value);
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(INVALID_ORDER);
-        }
+    private static int parseAmount(String value) {
+        int amount = StringConverter.toIntWithExceptionThrow(value,
+            () -> new IllegalArgumentException(INVALID_ORDER)
+        );
+        validateAmountPerMenu(amount);
+        return amount;
     }
 
     private static void validateAmountPerMenu(int amount) {
