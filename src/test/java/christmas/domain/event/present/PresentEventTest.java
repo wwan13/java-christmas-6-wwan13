@@ -16,7 +16,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 class PresentEventTest {
 
     @Test
-    void 총_주문_금액이_120000원을_넘으면_샴페인_1_개를_증정한다() {
+    void 증정_메뉴는_샴페인_이다() {
         // given
         int totalOrderPrice = 130_000;
 
@@ -25,19 +25,16 @@ class PresentEventTest {
 
         // then
         assertThat(presentEvent.getPresentedMenuName()).isEqualTo("샴페인");
-        assertThat(presentEvent.getPresentAmount()).isEqualTo(1);
     }
 
-    @Test
-    void 총_주문_금액이_120000원을_넘지_않으면_증정하지_않는다() {
-        // given
-        int totalOrderPrice = 100_000;
-
+    @ParameterizedTest(name = "총 주문 금액이 {0}원이면 샴페인을 {1}개 증정한다")
+    @CsvSource(value = {"130000, 1", "100000, 0, 10000, 0"})
+    void 총_주문_금액에_따라_증정_메뉴를_증정한다(final int totalOrderPrice, final int expected) {
         // when
         PresentEvent presentEvent = PresentEvent.apply(totalOrderPrice);
 
         // then
-        assertThat(presentEvent.getPresentAmount()).isEqualTo(0);
+        assertThat(presentEvent.getPresentAmount()).isEqualTo(expected);
     }
 
     @ParameterizedTest
