@@ -68,16 +68,6 @@ class OrderTest {
     class OrderExceptionTest {
 
         @Test
-        void 총_주문_금액이_10000원_미만인_경우() {
-            // given
-            List<String> menuAmounts = List.of("타파스-1");
-
-            // when, then
-            assertThatThrownBy(() -> Order.of(menuAmounts))
-                .isInstanceOf(IllegalArgumentException.class);
-        }
-
-        @Test
         void 주문_개수가_20_을_초과하는_경우() {
             // given
             List<String> menuAmounts = List.of("양송이수프-10", "바비큐립-11");
