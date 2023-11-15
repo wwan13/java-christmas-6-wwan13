@@ -19,7 +19,7 @@ public class OutputView {
     private static final String MENU_AMOUNT_MESSAGE_FORMAT = "%s %d개\n";
     private static final String PRICE_FORMAT = "%s원\n";
     private static final String MINUS_PRICE_FORMAT = "%s원\n";
-    private static final String BENEFIT_DETAIL_MESSAGE_FORMAT = "%s: -%d원\n";
+    private static final String BENEFIT_DETAIL_MESSAGE_FORMAT = "%s: -%s원\n";
     private static final String NOTHING_MESSAGE = "없음";
 
     public void printStartMessage() {
@@ -59,7 +59,8 @@ public class OutputView {
             return;
         }
         benefitDetailDto.benefits().forEach((event, amount) ->
-            System.out.printf(BENEFIT_DETAIL_MESSAGE_FORMAT, event, amount));
+            System.out.printf(BENEFIT_DETAIL_MESSAGE_FORMAT,
+                event, NumberFormatter.format(amount)));
     }
 
     public void printTotalBenefitAmount(int totalBenefitAmount) {
